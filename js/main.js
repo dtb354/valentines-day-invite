@@ -1,6 +1,6 @@
+// javascript
 document.addEventListener("DOMContentLoaded", () => {
-    let noClicks = 1;
-    const maxNoClicks = 4;
+    let noClicks = 0;
     const minNoScale = 0.65;
     let noScale = 1;
     let yesScale = 1;
@@ -11,56 +11,59 @@ document.addEventListener("DOMContentLoaded", () => {
     const yesButtonStyle = window.getComputedStyle(yesButton);
     const maxYesWidth = parseFloat(yesButtonStyle.maxWidth);
 
-// array of gifs in order
-const gifs = ["tandemaus_gifs/tandemaus-scream.gif", 
-    "tandemaus_gifs/tandemaus-run.gif", 
-    "tandemaus_gifs/maushold-tandemaus.gif", 
-    "tandemaus_gifs/tandemaus-pokemon.gif"];
+    const gifs = [
+        "tandemaus_gifs/tandemaus-scream.gif",
+        "tandemaus_gifs/tandemaus-run.gif",
+        "tandemaus_gifs/maushold-tandemaus.gif",
+        "tandemaus_gifs/tandemaus-pokemon.gif"
+    ];
 
-const buttonMessages = ["WHYYYY NOOOO", "please? 🥺", "BABY PLEASE", "i love you...", "I will kiss you :3", "I will buy you lego!", "I WILL BUY YOU POKEMON CARDS", "Im gonna go cry now bye", "bruh..."]
+    const buttonMessages = [
+        "WHYYYY NOOOO",
+        "please? 🥺",
+        "BABY PLEASE",
+        "i love you...",
+        "I will kiss you :3",
+        "I will buy you lego!",
+        "I WILL BUY YOU POKEMON CARDS",
+        "Im gonna go cry now bye",
+        "bruh..."
+    ];
 
-// no button clicked
-noButton.addEventListener("click", () => {
-    if (noClicks < maxNoClicks) {
-        // change image
-        gifElement.src = gifs[noClicks];
-    }
+    noButton.addEventListener("click", () => {
+        // cycle gifs using modulo
+        gifElement.src = gifs[noClicks % gifs.length];
 
-    // change no button text
-    noButton.textContent = buttonMessages[noClicks % maxNoClicks];
+        // cycle messages independently
+        noButton.textContent = buttonMessages[noClicks % buttonMessages.length];
 
-    // Adjust button width to fit text
-    noButton.style.width = 'auto';
-    noButton.style.width = `${noButton.scrollWidth}px`;
+        // Adjust button width to fit text
+        noButton.style.width = 'auto';
+        noButton.style.width = `${noButton.scrollWidth}px`;
 
-    // decrease the size of the no button
-    if (noScale > minNoScale) {
-        noScale -= 0.1;
-        noButton.style.transform = `scale(${noScale})`;
-    }
+        // decrease the size of the no button
+        if (noScale > minNoScale) {
+            noScale -= 0.1;
+            noButton.style.transform = `scale(${noScale})`;
+        }
 
-    // Calculate the scaled width of the yesButton
-    const baseWidth = parseFloat(yesButtonStyle.width);
-    const scaledWidth = baseWidth * yesScale; // Reflects the actual visual size of the button
+        // Calculate the scaled width of the yesButton
+        const baseWidth = parseFloat(yesButtonStyle.width);
+        const scaledWidth = baseWidth * yesScale;
+        console.log(`Scaled Width: ${scaledWidth}, Max Width: ${maxYesWidth}`);
 
-    console.log(`Scaled Width: ${scaledWidth}, Max Width: ${maxYesWidth}`);
+        if (scaledWidth < maxYesWidth) {
+            yesScale += 0.5;
+            yesButton.style.transform = `scale(${yesScale})`;
 
-    // Check if the scaled width is less than the max width
-    if (scaledWidth < maxYesWidth) {
-        yesScale += 0.5; // Increment scale by a smaller step
-        yesButton.style.transform = `scale(${yesScale})`;
+            const rootStyles = getComputedStyle(document.documentElement);
+            const gapScaleFactor = parseFloat(rootStyles.getPropertyValue("--gap-scale-factor")) || 250;
 
-        // Get the current gap scale factor from CSS
-        const rootStyles = getComputedStyle(document.documentElement);
-        const gapScaleFactor = parseFloat(rootStyles.getPropertyValue("--gap-scale-factor")) || 250;
+            const currentGap = parseFloat(buttonContainer.style.gap) || 20;
+            const newGap = Math.sqrt(currentGap * gapScaleFactor);
+            buttonContainer.style.gap = `${newGap}px`;
+        }
 
-        // Adjust the gap dynamically
-        const currentGap = parseFloat(buttonContainer.style.gap) || 20;
-        const newGap = Math.sqrt(currentGap * gapScaleFactor); // Scale based on the factor
-        buttonContainer.style.gap = `${newGap}px`;
-    }
-
-    // increment the number of clicks
-    noClicks++;
+        noClicks++;
     });
 });
